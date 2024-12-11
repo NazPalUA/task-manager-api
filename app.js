@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json());
 
 // Import routes
-const tasksRoutes = require('./routes/tasks');
+const tasksRoutes = require('./src/routes/tasks');
 
 // Use routes
 app.use('/api/v1/tasks', tasksRoutes);
