@@ -1,16 +1,19 @@
 const express = require('express');
+
 const app = express();
-const tasks = require('./routes/tasks');
 
 // Middleware
 app.use(express.json());
 
-// Routes
+// Import routes
+const tasksRoutes = require('./routes/tasks');
+
+// Use routes
+app.use('/api/v1/tasks', tasksRoutes);
+
 app.get('/hello', (req, res) => {
   res.send('Task Manager App');
 });
-
-app.use('/api/v1/tasks', tasks);
 
 // Start the server
 const port = process.env.PORT || 3000;
