@@ -1,4 +1,4 @@
-import { type Task } from '.prisma/client';
+import { Prisma } from '.prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { Request, Response } from 'express';
 import prisma from '../client';
@@ -14,9 +14,8 @@ const getAllTasks = async (req: Request, res: Response): Promise<void> => {
 
 const createTask = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name } = req.body;
-    const data: Partial<Task> = {
-      name,
+    const data: Prisma.TaskCreateInput = {
+      name: req.body.name,
     };
 
     const task = await prisma.task.create({ data });
@@ -29,7 +28,7 @@ const createTask = async (req: Request, res: Response): Promise<void> => {
 const getTask = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   try {
-    const where: Partial<Task> = { id };
+    const where: Prisma.TaskWhereUniqueInput = { id };
     const task = await prisma.task.findUnique({ where });
 
     if (!task) {
@@ -54,8 +53,8 @@ const getTask = async (req: Request, res: Response): Promise<void> => {
 const updateTask = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   try {
-    const where: Partial<Task> = { id };
-    const data: Partial<Task> = {
+    const where: Prisma.TaskWhereUniqueInput = { id };
+    const data: Prisma.TaskUpdateInput = {
       ...req.body,
     };
 
@@ -75,7 +74,7 @@ const updateTask = async (req: Request, res: Response): Promise<void> => {
 const deleteTask = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   try {
-    const where: Partial<Task> = { id };
+    const where: Prisma.TaskWhereUniqueInput = { id };
     await prisma.task.delete({ where });
     res.status(200).json({ success: true, msg: 'Task deleted successfully' });
   } catch (error) {
