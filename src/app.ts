@@ -1,9 +1,11 @@
+import { PrismaClient } from '@prisma/client';
 import 'dotenv/config';
 import express, { Application } from 'express';
 import { errorHandler } from './middleware/error-handler';
 import taskRoutes from './routes/tasks';
 
 const app: Application = express();
+const prisma = new PrismaClient();
 const port: number = Number(process.env.PORT) || 3000;
 
 if (!process.env.PORT) {
@@ -17,11 +19,14 @@ app.use('/api/v1/tasks', taskRoutes);
 app.use(express.static('./public'));
 app.use(errorHandler);
 
-process.on('uncaughtException', err => {
-  console.error('Uncaught Exception:', err);
-  process.exit(1);
+const server = app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+process.on('SIGINT', async () => {
+  console.log('Shutting down gracefully...');
+  await prisma.$disconnect();
+  server.close(() => {
+    process.exit(0);
+  });
 });
