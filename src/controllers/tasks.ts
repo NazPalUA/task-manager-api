@@ -1,3 +1,4 @@
+import { type Task } from '.prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { Request, Response } from 'express';
 import prisma from '../client';
@@ -14,22 +15,13 @@ const getAllTasks = async (req: Request, res: Response): Promise<void> => {
 const createTask = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name } = req.body;
-    if (!name || typeof name !== 'string' || name.trim().length === 0) {
-      res
-        .status(400)
-        .json({ success: false, msg: 'Please provide a valid name' });
-      return;
-    }
+    const data: Partial<Task> = {
+      name,
+    };
 
-    const task = await prisma.task.create({
-      data: {
-        name,
-      },
-    });
-
+    const task = await prisma.task.create({ data });
     res.status(201).json({ success: true, data: task });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ success: false, msg: 'Server Error' });
   }
 };
@@ -37,9 +29,8 @@ const createTask = async (req: Request, res: Response): Promise<void> => {
 const getTask = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   try {
-    const task = await prisma.task.findUnique({
-      where: { id },
-    });
+    const where: Partial<Task> = { id };
+    const task = await prisma.task.findUnique({ where });
 
     if (!task) {
       res.status(404).json({ success: false, msg: `No task with id ${id}` });
@@ -63,16 +54,12 @@ const getTask = async (req: Request, res: Response): Promise<void> => {
 const updateTask = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   try {
-    const { name, completed } = req.body;
+    const where: Partial<Task> = { id };
+    const data: Partial<Task> = {
+      ...req.body,
+    };
 
-    const task = await prisma.task.update({
-      where: { id },
-      data: {
-        name,
-        completed,
-      },
-    });
-
+    const task = await prisma.task.update({ where, data });
     res.status(200).json({ success: true, data: task });
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
@@ -88,10 +75,8 @@ const updateTask = async (req: Request, res: Response): Promise<void> => {
 const deleteTask = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   try {
-    await prisma.task.delete({
-      where: { id },
-    });
-
+    const where: Partial<Task> = { id };
+    await prisma.task.delete({ where });
     res.status(200).json({ success: true, msg: 'Task deleted successfully' });
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
