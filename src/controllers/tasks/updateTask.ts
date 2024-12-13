@@ -1,26 +1,28 @@
-import { Prisma } from '.prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import { z } from 'zod';
 import prisma from '../../client';
+import { updateTaskSchema } from '../../schemas/task.schema';
 
-const updateTask = async (req: Request, res: Response): Promise<void> => {
+type UpdateTaskRequest = Request<
+  z.infer<typeof updateTaskSchema>['params'],
+  unknown,
+  z.infer<typeof updateTaskSchema>['body']
+>;
+
+const updateTask = async (
+  req: UpdateTaskRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const { id } = req.params;
   try {
-    const where: Prisma.TaskWhereUniqueInput = { id };
-    const data: Prisma.TaskUpdateInput = {
-      ...req.body,
-    };
-
-    const task = await prisma.task.update({ where, data });
+    const task = await prisma.task.update({
+      where: { id },
+      data: req.body,
+    });
     res.status(200).json({ success: true, data: task });
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
-      if (error.code === 'P2025') {
-        res.status(404).json({ success: false, msg: `No task with id ${id}` });
-        return;
-      }
-    }
-    res.status(500).json({ success: false, msg: 'Server Error' });
+    next(error);
   }
 };
 

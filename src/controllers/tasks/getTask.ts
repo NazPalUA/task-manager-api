@@ -1,13 +1,18 @@
-import { Prisma } from '.prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import { z } from 'zod';
 import prisma from '../../client';
+import { getTaskSchema } from '../../schemas/task.schema';
 
-const getTask = async (req: Request, res: Response): Promise<void> => {
+type GetTaskRequest = Request<z.infer<typeof getTaskSchema>['params']>;
+
+const getTask = async (
+  req: GetTaskRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const { id } = req.params;
   try {
-    const where: Prisma.TaskWhereUniqueInput = { id };
-    const task = await prisma.task.findUnique({ where });
+    const task = await prisma.task.findUnique({ where: { id } });
 
     if (!task) {
       res.status(404).json({ success: false, msg: `No task with id ${id}` });
@@ -16,15 +21,7 @@ const getTask = async (req: Request, res: Response): Promise<void> => {
 
     res.status(200).json({ success: true, data: task });
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
-      if (error.code === 'P2023') {
-        res
-          .status(400)
-          .json({ success: false, msg: 'Invalid ObjectId format' });
-        return;
-      }
-    }
-    res.status(500).json({ success: false, msg: 'Server Error' });
+    next(error);
   }
 };
 

@@ -1,22 +1,21 @@
-import { Prisma } from '.prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import { z } from 'zod';
 import prisma from '../../client';
+import { deleteTaskSchema } from '../../schemas/task.schema';
 
-const deleteTask = async (req: Request, res: Response): Promise<void> => {
+type DeleteTaskRequest = Request<z.infer<typeof deleteTaskSchema>['params']>;
+
+const deleteTask = async (
+  req: DeleteTaskRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const { id } = req.params;
   try {
-    const where: Prisma.TaskWhereUniqueInput = { id };
-    await prisma.task.delete({ where });
+    await prisma.task.delete({ where: { id } });
     res.status(200).json({ success: true, msg: 'Task deleted successfully' });
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
-      if (error.code === 'P2025') {
-        res.status(404).json({ success: false, msg: `No task with id ${id}` });
-        return;
-      }
-    }
-    res.status(500).json({ success: false, msg: 'Server Error' });
+    next(error);
   }
 };
 
