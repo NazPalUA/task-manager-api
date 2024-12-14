@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import 'dotenv/config';
 import express, { Application } from 'express';
 import { errorHandler } from './middleware/error-handler';
+import { notFound } from './middleware/not-found';
 import taskRoutes from './routes/tasks';
 
 const app: Application = express();
@@ -17,6 +18,11 @@ app.use('/api/v1/tasks', taskRoutes);
 
 // Serve static files
 app.use(express.static('./public'));
+
+// Handle 404s
+app.use(notFound);
+
+// Handle errors
 app.use(errorHandler);
 
 const server = app.listen(port, () => {
