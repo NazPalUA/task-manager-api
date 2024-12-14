@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
 import prisma from '../../client';
+import { asyncWrapper } from '../../middleware/async';
 import { updateTaskSchema } from '../../schemas/task.schema';
 
 type UpdateTaskRequest = Request<
@@ -9,21 +10,20 @@ type UpdateTaskRequest = Request<
   z.infer<typeof updateTaskSchema>['body']
 >;
 
-const updateTask = async (
+const updateTask_NoAsync = async (
   req: UpdateTaskRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   const { id } = req.params;
-  try {
-    const task = await prisma.task.update({
-      where: { id },
-      data: req.body,
-    });
-    res.status(200).json({ success: true, data: task });
-  } catch (error) {
-    next(error);
-  }
+
+  const task = await prisma.task.update({
+    where: { id },
+    data: req.body,
+  });
+  res.status(200).json({ success: true, data: task });
 };
+
+const updateTask = asyncWrapper(updateTask_NoAsync);
 
 export { updateTask };
