@@ -9,6 +9,7 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ): void => {
+  console.log(err);
   if (err instanceof CustomError) {
     res.status(err.statusCode).json({
       success: false,
@@ -46,7 +47,10 @@ export const errorHandler = (
     }
   }
 
-  res.status(500).json({
+  const statusCode =
+    (err as CustomError).statusCode || (err as any).status || 500;
+
+  res.status(statusCode).json({
     success: false,
     msg: err.message || 'Internal Server Error',
   });
