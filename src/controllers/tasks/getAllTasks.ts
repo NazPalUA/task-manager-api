@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import prisma from '../../client';
-import { asyncWrapper } from '../../middleware/async';
+import { asyncWrapper } from '../../utils/asyncWrapper';
 
 const getAllTasks_NoAsync = async (
   _req: Request,

@@ -3,15 +3,11 @@ import 'dotenv/config';
 import express, { Application } from 'express';
 import { errorHandler } from './middleware/error-handler';
 import { notFound } from './middleware/not-found';
-import taskRoutes from './routes/tasks';
+import taskRoutes from './routes/tasks.routes';
 
 const app: Application = express();
 const prisma = new PrismaClient();
 const port: number = Number(process.env.PORT) || 3000;
-
-if (!process.env.PORT) {
-  throw new Error('PORT is required');
-}
 
 app.use(express.json());
 app.use('/api/v1/tasks', taskRoutes);

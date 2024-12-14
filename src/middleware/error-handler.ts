@@ -1,7 +1,7 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
-import { CustomError } from '../errors/custom';
+import { CustomError } from '../errors/custom-error';
 
 export const errorHandler = (
   err: Error | CustomError,

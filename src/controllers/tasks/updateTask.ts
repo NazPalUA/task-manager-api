@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
 import prisma from '../../client';
-import { asyncWrapper } from '../../middleware/async';
 import { updateTaskSchema } from '../../schemas/task.schema';
+import { asyncWrapper } from '../../utils/asyncWrapper';
 
 type UpdateTaskRequest = Request<
   z.infer<typeof updateTaskSchema>['params'],

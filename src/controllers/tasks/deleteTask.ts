@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
 import prisma from '../../client';
-import { asyncWrapper } from '../../middleware/async';
 import { deleteTaskSchema } from '../../schemas/task.schema';
+import { asyncWrapper } from '../../utils/asyncWrapper';
 
 type DeleteTaskRequest = Request<z.infer<typeof deleteTaskSchema>['params']>;
 

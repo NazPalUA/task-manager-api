@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
 import prisma from '../../client';
-import { CustomError } from '../../errors/custom';
-import { asyncWrapper } from '../../middleware/async';
+import { CustomError } from '../../errors/custom-error';
 import { getTaskSchema } from '../../schemas/task.schema';
+import { asyncWrapper } from '../../utils/asyncWrapper';
 
 type GetTaskRequest = Request<z.infer<typeof getTaskSchema>['params']>;
 
