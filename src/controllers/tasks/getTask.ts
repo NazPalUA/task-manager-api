@@ -3,11 +3,10 @@ import { z } from 'zod';
 import prisma from '../../client';
 import { CustomError } from '../../errors/custom-error';
 import { getTaskSchema } from '../../schemas/task.schema';
-import { asyncWrapper } from '../../utils/asyncWrapper';
 
 type GetTaskRequest = Request<z.infer<typeof getTaskSchema>['params']>;
 
-const getTask_NoAsync = async (
+const getTask = async (
   req: GetTaskRequest,
   res: Response,
   next: NextFunction
@@ -22,7 +21,5 @@ const getTask_NoAsync = async (
 
   res.status(200).json({ success: true, data: task });
 };
-
-const getTask = asyncWrapper(getTask_NoAsync);
 
 export { getTask };

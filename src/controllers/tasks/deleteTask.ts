@@ -2,11 +2,10 @@ import { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
 import prisma from '../../client';
 import { deleteTaskSchema } from '../../schemas/task.schema';
-import { asyncWrapper } from '../../utils/asyncWrapper';
 
 type DeleteTaskRequest = Request<z.infer<typeof deleteTaskSchema>['params']>;
 
-const deleteTask_NoAsync = async (
+const deleteTask = async (
   req: DeleteTaskRequest,
   res: Response,
   next: NextFunction
@@ -16,7 +15,5 @@ const deleteTask_NoAsync = async (
   await prisma.task.delete({ where: { id } });
   res.status(200).json({ success: true, msg: 'Task deleted successfully' });
 };
-
-const deleteTask = asyncWrapper(deleteTask_NoAsync);
 
 export { deleteTask };

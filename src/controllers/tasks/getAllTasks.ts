@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import prisma from '../../client';
-import { asyncWrapper } from '../../utils/asyncWrapper';
 
-const getAllTasks_NoAsync = async (
+const getAllTasks = async (
   _req: Request,
   res: Response,
   next: NextFunction
@@ -10,7 +9,5 @@ const getAllTasks_NoAsync = async (
   const tasks = await prisma.task.findMany();
   res.status(200).json({ success: true, data: tasks });
 };
-
-const getAllTasks = asyncWrapper(getAllTasks_NoAsync);
 
 export { getAllTasks };

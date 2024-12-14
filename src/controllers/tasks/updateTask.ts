@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
 import prisma from '../../client';
 import { updateTaskSchema } from '../../schemas/task.schema';
-import { asyncWrapper } from '../../utils/asyncWrapper';
 
 type UpdateTaskRequest = Request<
   z.infer<typeof updateTaskSchema>['params'],
@@ -10,7 +9,7 @@ type UpdateTaskRequest = Request<
   z.infer<typeof updateTaskSchema>['body']
 >;
 
-const updateTask_NoAsync = async (
+const updateTask = async (
   req: UpdateTaskRequest,
   res: Response,
   next: NextFunction
@@ -23,7 +22,5 @@ const updateTask_NoAsync = async (
   });
   res.status(200).json({ success: true, data: task });
 };
-
-const updateTask = asyncWrapper(updateTask_NoAsync);
 
 export { updateTask };
