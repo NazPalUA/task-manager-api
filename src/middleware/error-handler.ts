@@ -1,7 +1,7 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
-import { CustomError } from '../types/error';
+import { CustomError } from '../errors/custom';
 
 export const errorHandler = (
   err: Error | CustomError,
@@ -9,6 +9,14 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ): void => {
+  if (err instanceof CustomError) {
+    res.status(err.statusCode).json({
+      success: false,
+      msg: err.message,
+    });
+    return;
+  }
+
   if (err instanceof ZodError) {
     res.status(400).json({
       success: false,
@@ -38,7 +46,7 @@ export const errorHandler = (
     }
   }
 
-  const statusCode = (err as CustomError).status || 500;
+  const statusCode = (err as CustomError).statusCode || 500;
   res.status(statusCode).json({
     success: false,
     msg: err.message || 'Internal Server Error',

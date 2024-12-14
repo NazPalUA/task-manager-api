@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
 import prisma from '../../client';
+import { CustomError } from '../../errors/custom';
 import { asyncWrapper } from '../../middleware/async';
 import { getTaskSchema } from '../../schemas/task.schema';
 
@@ -16,8 +17,7 @@ const getTask_NoAsync = async (
   const task = await prisma.task.findUnique({ where: { id } });
 
   if (!task) {
-    res.status(404).json({ success: false, msg: `No task with id ${id}` });
-    return;
+    return next(new CustomError(`No task with id ${id}`, 404));
   }
 
   res.status(200).json({ success: true, data: task });
